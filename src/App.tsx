@@ -36,6 +36,7 @@ interface StudentInfo {
   firstName: string;
   lastName: string;
   group: string;
+  subject: string;
 }
 
 interface EvaluationResult {
@@ -47,7 +48,7 @@ interface EvaluationResult {
 }
 
 export default function App() {
-  const [student, setStudent] = useState<StudentInfo>({ firstName: '', lastName: '', group: '' });
+  const [student, setStudent] = useState<StudentInfo>({ firstName: '', lastName: '', group: '', subject: '' });
   const [criteria, setCriteria] = useState<string>('1. Mavzuning ochib berilishi\n2. Grammatik xatolar\n3. Manbalardan foydalanish\n4. Kreativ yondashuv');
   const [gradingSystem, setGradingSystem] = useState<string>('5 ballik sistema (1-5)');
   const [file, setFile] = useState<File | null>(null);
@@ -102,7 +103,7 @@ export default function App() {
   };
 
   const evaluateWork = async () => {
-    if (!student.firstName || !student.lastName || !student.group || !fileContent) {
+    if (!student.firstName || !student.lastName || !student.group || !student.subject || !fileContent) {
       setResult(prev => ({ ...prev, status: 'error', error: "Iltimos, barcha maydonlarni to'ldiring va faylni yuklang." }));
       return;
     }
@@ -118,6 +119,7 @@ export default function App() {
               {
                 text: `Siz professional o'qituvchi va baholovchisiz. Quyidagi o'quvchining mustaqil ishini baholang.
                 
+                Fan: ${student.subject}
                 O'quvchi: ${student.firstName} ${student.lastName}
                 Guruh: ${student.group}
                 
@@ -127,13 +129,15 @@ export default function App() {
                 Baholash mezonlari:
                 ${criteria}
                 
+                MUHIM: Natija (ball) har doim butun sonda bo'lishi shart.
+                
                 Iltimos, quyidagi formatda javob bering (JSON emas, lekin aniq bo'limlar bilan):
                 # BAHOLASH NATIJASI
-                **Umumiy ball:** [Ball/Maksimal ball]
-                **Xulosa:** [Qisqa va lo'nda xulosa]
+                **Umumiy ball:** [Faqat butun sonni yozing]
+                **Xulosa:** [Fanga mos ravishda qisqa va lo'nda xulosa]
                 
                 # BATAFSIL TAHLIL
-                [Har bir mezon bo'yicha batafsil fikrlar va tavsiyalar]
+                [Har bir mezon bo'yicha fanga xos batafsil fikrlar va tavsiyalar]
                 `
               },
               typeof fileContent === 'string' 
@@ -167,7 +171,7 @@ export default function App() {
   };
 
   const resetForm = () => {
-    setStudent({ firstName: '', lastName: '', group: '' });
+    setStudent({ firstName: '', lastName: '', group: '', subject: '' });
     setFile(null);
     setFileContent(null);
     setResult({ score: '', summary: '', details: '', status: 'idle' });
@@ -207,40 +211,57 @@ export default function App() {
               <h2 className="font-semibold text-slate-800">O'quvchi Ma'lumotlari</h2>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Ism</label>
-                <input 
-                  type="text" 
-                  placeholder="Masalan: Ali"
-                  value={student.firstName}
-                  onChange={(e) => setStudent(prev => ({ ...prev, firstName: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                />
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Ism</label>
+                  <input 
+                    type="text" 
+                    placeholder="Masalan: Ali"
+                    value={student.firstName}
+                    onChange={(e) => setStudent(prev => ({ ...prev, firstName: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Familiya</label>
+                  <input 
+                    type="text" 
+                    placeholder="Masalan: Valiyev"
+                    value={student.lastName}
+                    onChange={(e) => setStudent(prev => ({ ...prev, lastName: e.target.value }))}
+                    className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                  />
+                </div>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Familiya</label>
-                <input 
-                  type="text" 
-                  placeholder="Masalan: Valiyev"
-                  value={student.lastName}
-                  onChange={(e) => setStudent(prev => ({ ...prev, lastName: e.target.value }))}
-                  className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                />
-              </div>
-            </div>
 
-            <div className="space-y-1.5">
-              <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Guruh / Sinf</label>
-              <div className="relative">
-                <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                <input 
-                  type="text" 
-                  placeholder="Masalan: 301-guruh"
-                  value={student.group}
-                  onChange={(e) => setStudent(prev => ({ ...prev, group: e.target.value }))}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
-                />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Fan Nomi</label>
+                  <div className="relative">
+                    <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Masalan: Matematika"
+                      value={student.subject}
+                      onChange={(e) => setStudent(prev => ({ ...prev, subject: e.target.value }))}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-500 uppercase ml-1">Guruh / Sinf</label>
+                  <div className="relative">
+                    <Users className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+                    <input 
+                      type="text" 
+                      placeholder="Masalan: 301-guruh"
+                      value={student.group}
+                      onChange={(e) => setStudent(prev => ({ ...prev, group: e.target.value }))}
+                      className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                    />
+                  </div>
+                </div>
               </div>
             </div>
           </div>
