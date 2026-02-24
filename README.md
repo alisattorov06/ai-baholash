@@ -20,22 +20,6 @@ EduAssess AI — bu o'quvchilarning mustaqil ishlarini sun'iy intellekt (Gemini 
 - **Fayl Ishlovchi:** Mammoth.js (Word), FileReader API
 - **Animatsiyalar:** Framer Motion
 
-## 📦 O'rnatish va Ishga Tushirish
-
-1. Loyihani yuklab oling.
-2. Zaruriy kutubxonalarni o'rnating:
-   ```bash
-   npm install
-   ```
-3. `.env` fayliga Gemini API kalitini qo'shing:
-   ```env
-   GEMINI_API_KEY=sizning_api_kalitingiz
-   ```
-4. Dasturni ishga tushiring:
-   ```bash
-   npm run dev
-   ```
-
 ## 📝 Foydalanish Yo'riqnomasi
 
 1. O'quvchi ma'lumotlarini (ism, familiya, guruh, fan) to'ldiring.
@@ -45,4 +29,5 @@ EduAssess AI — bu o'quvchilarning mustaqil ishlarini sun'iy intellekt (Gemini 
 5. O'ng tarafdagi natija oynasida ball, AI ulushi, fanga doirlik va batafsil tahlilni ko'ring.
 
 ---
-*Yaratuvchi: AI Studio Agent*
+*Yaratuvchi: Sattorov Ali*
+Demo: https://ai-baholash.vercel.app/
