@@ -43,6 +43,8 @@ interface EvaluationResult {
   score: string;
   summary: string;
   details: string;
+  aiUsage: string;
+  subjectRelevance: string;
   status: 'idle' | 'loading' | 'success' | 'error';
   error?: string;
 }
@@ -51,12 +53,15 @@ export default function App() {
   const [student, setStudent] = useState<StudentInfo>({ firstName: '', lastName: '', group: '', subject: '' });
   const [criteria, setCriteria] = useState<string>('1. Mavzuning ochib berilishi\n2. Grammatik xatolar\n3. Manbalardan foydalanish\n4. Kreativ yondashuv');
   const [gradingSystem, setGradingSystem] = useState<string>('5 ballik sistema (1-5)');
+  const [checkAI, setCheckAI] = useState<boolean>(true);
   const [file, setFile] = useState<File | null>(null);
   const [fileContent, setFileContent] = useState<string | { data: string; mimeType: string } | null>(null);
   const [result, setResult] = useState<EvaluationResult>({
     score: '',
     summary: '',
     details: '',
+    aiUsage: '',
+    subjectRelevance: '',
     status: 'idle'
   });
 
@@ -108,7 +113,7 @@ export default function App() {
       return;
     }
 
-    setResult({ score: '', summary: '', details: '', status: 'loading' });
+    setResult({ score: '', summary: '', details: '', aiUsage: '', subjectRelevance: '', status: 'loading' });
 
     try {
       const model = genAI.models.generateContent({
@@ -129,15 +134,22 @@ export default function App() {
                 Baholash mezonlari:
                 ${criteria}
                 
+                DIQQAT: 
+                1. Fanga doirligini tekshiring. Ish ko'rsatilgan fanga (${student.subject}) qanchalik bog'liqligini foizda aniqlang (0-100%).
+                2. Agar fanga bog'liqlik 50% dan past bo'lsa, ishni baholamang va sababini tushuntiring.
+                3. ${checkAI ? "Sun'iy intellekt (AI) alomatlarini qat'iy tekshiring. AI foizi 40% dan oshsa, balldan 30% ayiring." : ""}
+
                 MUHIM: Natija (ball) har doim butun sonda bo'lishi shart.
                 
-                Iltimos, quyidagi formatda javob bering (JSON emas, lekin aniq bo'limlar bilan):
+                Iltimos, quyidagi formatda javob bering:
                 # BAHOLASH NATIJASI
-                **Umumiy ball:** [Faqat butun sonni yozing]
-                **Xulosa:** [Fanga mos ravishda qisqa va lo'nda xulosa]
+                **Fanga bog'liqlik foizi:** [X]%
+                **Umumiy ball:** [Faqat yakuniy butun sonni yozing yoki 'Baholanmadi']
+                **AI foydalanish foizi:** [X]%
+                **Xulosa:** [Qisqa va lo'nda xulosa]
                 
                 # BATAFSIL TAHLIL
-                [Har bir mezon bo'yicha fanga xos batafsil fikrlar va tavsiyalar]
+                [Batafsil tahlil va tavsiyalar]
                 `
               },
               typeof fileContent === 'string' 
@@ -157,10 +169,14 @@ export default function App() {
       // Simple parsing (could be more robust)
       const scoreMatch = text.match(/\*\*Umumiy ball:\*\*\s*(.*)/);
       const summaryMatch = text.match(/\*\*Xulosa:\*\*\s*(.*)/);
+      const aiMatch = text.match(/\*\*AI foydalanish foizi:\*\*\s*(.*)/);
+      const relevanceMatch = text.match(/\*\*Fanga bog'liqlik foizi:\*\*\s*(.*)/);
       
       setResult({
         score: scoreMatch ? scoreMatch[1] : 'Baholanmagan',
         summary: summaryMatch ? summaryMatch[1] : 'Xulosa mavjud emas',
+        aiUsage: aiMatch ? aiMatch[1] : 'Aniqlanmadi',
+        subjectRelevance: relevanceMatch ? relevanceMatch[1] : 'Aniqlanmadi',
         details: text,
         status: 'success'
       });
@@ -174,7 +190,7 @@ export default function App() {
     setStudent({ firstName: '', lastName: '', group: '', subject: '' });
     setFile(null);
     setFileContent(null);
-    setResult({ score: '', summary: '', details: '', status: 'idle' });
+    setResult({ score: '', summary: '', details: '', aiUsage: '', subjectRelevance: '', status: 'idle' });
     if (fileInputRef.current) fileInputRef.current.value = '';
   };
 
@@ -269,7 +285,7 @@ export default function App() {
           <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-6 space-y-6">
             <div className="flex items-center gap-2 pb-2 border-b border-slate-100">
               <ClipboardCheck className="w-5 h-5 text-indigo-600" />
-              <h2 className="font-semibold text-slate-800">Baholash Mezonlari va Sistemasi</h2>
+              <h2 className="font-semibold text-slate-800">Baholash Mezonlari va AI Nazorati</h2>
             </div>
             
             <div className="space-y-4">
@@ -293,6 +309,30 @@ export default function App() {
                   className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none font-sans text-sm"
                 />
               </div>
+
+              <div className="flex items-center justify-between p-4 bg-indigo-50 rounded-xl border border-indigo-100">
+                <div className="space-y-0.5">
+                  <p className="text-sm font-bold text-indigo-900">AI Nazorati</p>
+                  <p className="text-xs text-indigo-600">Sun'iy intellekt alomatlarini tekshirish</p>
+                </div>
+                <label className="relative inline-flex items-center cursor-pointer">
+                  <input 
+                    type="checkbox" 
+                    checked={checkAI} 
+                    onChange={(e) => setCheckAI(e.target.checked)} 
+                    className="sr-only peer" 
+                  />
+                  <div className="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600"></div>
+                </label>
+              </div>
+              {checkAI && (
+                <div className="flex items-start gap-2 p-3 bg-amber-50 border border-amber-100 rounded-lg">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-amber-700 leading-tight">
+                    <strong>Eslatma:</strong> Agar AI ulushi 40% dan oshsa, ball avtomatik ravishda 30% ga pasaytiriladi.
+                  </p>
+                </div>
+              )}
             </div>
           </div>
 
@@ -422,18 +462,75 @@ export default function App() {
 
               {result.status === 'success' && (
                 <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500">
-                  {/* Score Card */}
-                  <div className="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm flex items-center justify-between">
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">Umumiy Ball</p>
-                      <p className="text-3xl font-black text-indigo-600">{result.score}</p>
+                  {/* Score Card - Redesigned for better spacing */}
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Main Score */}
+                      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+                        <div className="bg-indigo-100 p-3 rounded-xl">
+                          <ClipboardCheck className="w-6 h-6 text-indigo-600" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Umumiy Ball</p>
+                          <p className="text-2xl font-black text-indigo-600 leading-none mt-1">{result.score}</p>
+                        </div>
+                      </div>
+
+                      {/* AI Usage */}
+                      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+                        <div className={cn(
+                          "p-3 rounded-xl",
+                          parseInt(result.aiUsage) > 40 ? "bg-amber-100 text-amber-600" : "bg-slate-100 text-slate-600"
+                        )}>
+                          <AlertCircle className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">AI Ulushi</p>
+                          <p className={cn(
+                            "text-xl font-bold leading-none mt-1",
+                            parseInt(result.aiUsage) > 40 ? "text-amber-600" : "text-slate-700"
+                          )}>{result.aiUsage}</p>
+                        </div>
+                      </div>
+
+                      {/* Subject Relevance */}
+                      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+                        <div className={cn(
+                          "p-3 rounded-xl",
+                          parseInt(result.subjectRelevance) < 50 ? "bg-red-100 text-red-600" : "bg-emerald-100 text-emerald-600"
+                        )}>
+                          <CheckCircle2 className="w-6 h-6" />
+                        </div>
+                        <div>
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Fanga Doirlik</p>
+                          <p className={cn(
+                            "text-xl font-bold leading-none mt-1",
+                            parseInt(result.subjectRelevance) < 50 ? "text-red-600" : "text-emerald-600"
+                          )}>{result.subjectRelevance}</p>
+                        </div>
+                      </div>
+
+                      {/* Student Info Summary */}
+                      <div className="bg-white rounded-2xl border border-slate-200 p-5 shadow-sm flex items-center gap-4">
+                        <div className="bg-slate-100 p-3 rounded-xl text-slate-600">
+                          <User className="w-6 h-6" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">O'quvchi</p>
+                          <p className="font-bold text-slate-800 truncate mt-1">{student.firstName} {student.lastName}</p>
+                          <p className="text-[10px] text-slate-500 font-medium truncate">{student.subject} | {student.group}</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="h-12 w-[1px] bg-slate-100"></div>
-                    <div className="space-y-1 flex-1 pl-6">
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-wider">O'quvchi</p>
-                      <p className="font-bold text-slate-800">{student.firstName} {student.lastName}</p>
-                      <p className="text-xs text-slate-500">{student.group}</p>
-                    </div>
+
+                    {parseInt(result.subjectRelevance) < 50 && (
+                      <div className="bg-red-50 border border-red-100 rounded-xl p-3 flex items-center gap-3 animate-pulse">
+                        <AlertCircle className="w-5 h-5 text-red-600 shrink-0" />
+                        <p className="text-xs font-bold text-red-700">
+                          DIQQAT: Ish tanlangan fanga mos kelmadi!
+                        </p>
+                      </div>
+                    )}
                   </div>
 
                   {/* Summary */}
