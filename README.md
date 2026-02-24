@@ -1,20 +1,48 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# EduAssess AI - Mustaqil Ishlarni Baholash Tizimi
 
-# Run and deploy your AI Studio app
+EduAssess AI — bu o'quvchilarning mustaqil ishlarini sun'iy intellekt (Gemini AI) yordamida tahlil qilish va baholash uchun yaratilgan professional platforma. Ushbu dastur o'qituvchilarga vaqtni tejash va xolis baholash imkonini beradi.
 
-This contains everything you need to run your app locally.
+## 🚀 Asosiy Imkoniyatlar
 
-View your app in AI Studio: https://ai.studio/apps/4a09c1a8-fa68-412d-bcc8-c9ade18e11c1
+- **O'quvchi Ma'lumotlari:** Ism, familiya, guruh va fan nomini kiritish.
+- **Moslashuvchan Baholash:** O'qituvchi o'zining baholash sistemasi (masalan, 5 ballik, 100 ballik) va mezonlarini kiritishi mumkin.
+- **Fayllarni Qo'llab-quvvatlash:** PDF, Word (DOCX) va TXT formatidagi hujjatlarni yuklash va o'qish.
+- **AI Nazorati:** Ishning necha foizi sun'iy intellekt yordamida yozilganini aniqlash. Agar AI ulushi 40% dan oshsa, ball avtomatik ravishda 30% ga pasaytiriladi.
+- **Fanga Doirlik Tekshiruvi:** Ish tanlangan fanga qanchalik mosligini tekshirish. Agar moslik 50% dan past bo'lsa, ish baholanmaydi.
+- **Batafsil Tahlil:** AI har bir mezon bo'yicha batafsil xulosa va tavsiyalar beradi.
+- **Zamonaviy UI:** Tailwind CSS va Lucide-react piktogrammalari asosida yaratilgan qulay va chiroyli interfeys.
 
-## Run Locally
+## 🛠 Texnologiyalar
 
-**Prerequisites:**  Node.js
+- **Frontend:** React 19, TypeScript
+- **Styling:** Tailwind CSS
+- **AI Model:** Google Gemini 3 Flash
+- **Fayl Ishlovchi:** Mammoth.js (Word), FileReader API
+- **Animatsiyalar:** Framer Motion
 
+## 📦 O'rnatish va Ishga Tushirish
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+1. Loyihani yuklab oling.
+2. Zaruriy kutubxonalarni o'rnating:
+   ```bash
+   npm install
+   ```
+3. `.env` fayliga Gemini API kalitini qo'shing:
+   ```env
+   GEMINI_API_KEY=sizning_api_kalitingiz
+   ```
+4. Dasturni ishga tushiring:
+   ```bash
+   npm run dev
+   ```
+
+## 📝 Foydalanish Yo'riqnomasi
+
+1. O'quvchi ma'lumotlarini (ism, familiya, guruh, fan) to'ldiring.
+2. Baholash sistemasi va mezonlarini kiriting.
+3. Mustaqil ish faylini yuklang.
+4. "AI Baholashni Boshlash" tugmasini bosing.
+5. O'ng tarafdagi natija oynasida ball, AI ulushi, fanga doirlik va batafsil tahlilni ko'ring.
+
+---
+*Yaratuvchi: AI Studio Agent*
